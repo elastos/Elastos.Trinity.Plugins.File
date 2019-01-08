@@ -1,10 +1,10 @@
 {
-  "name": "elastos-trinity-plugins-file",
+  "name": "cordova-plugins-file",
   "version": "6.0.2-dev",
   "description": "Cordova File Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "elastos-trinity-plugins-file",
+    "id": "cordova-plugins-file",
     "platforms": [
       "android",
       "browser",
