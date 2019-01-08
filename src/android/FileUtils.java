@@ -29,7 +29,7 @@ import android.util.Base64;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaPlugin;
+import org.elastos.trinity.dapprt.TrinityPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PermissionHelper;
@@ -53,7 +53,7 @@ import java.util.HashSet;
 /**
  * This class provides file and directory services to JavaScript.
  */
-public class FileUtils extends CordovaPlugin {
+public class FileUtils extends TrinityPlugin {
     private static final String LOG_TAG = "FileUtils";
 
     public static int NOT_FOUND_ERR = 1;
