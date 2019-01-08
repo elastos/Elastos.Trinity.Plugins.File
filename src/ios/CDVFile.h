@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
+#import "TrinityPlugin.h"
 
 extern NSString* const kCDVAssetsLibraryPrefix;
 extern NSString* const kCDVFilesystemURLPrefix;
@@ -88,7 +89,7 @@ typedef int CDVFileError;
 
 @end
 
-@interface CDVFile : CDVPlugin {
+@interface CDVFile : TrinityPlugin {
     NSString* rootDocsPath;
     NSString* appDocsPath;
     NSString* appLibraryPath;
