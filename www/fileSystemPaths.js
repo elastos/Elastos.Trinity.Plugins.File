@@ -58,5 +58,11 @@ channel.onCordovaReady.subscribe(function () {
         }
         channel.initializationComplete('onFileSystemPathsReady');
     }
-    exec(after, null, 'File', 'requestAllPaths', []);
+    function error (e) {
+        channel.initializationComplete('onFileSystemPathsReady');
+        if (e != "The plugin:'File' isn't add plugin access list!!") {
+            console.log('Error initializing file system: ' + e);
+        }
+    }
+    exec(after, error, 'File', 'requestAllPaths', []);
 });
