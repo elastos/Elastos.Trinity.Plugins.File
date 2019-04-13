@@ -184,9 +184,9 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
-    	tempRoot = activity.getCacheDir().getAbsolutePath();
+    	tempRoot = getDataPath();
     	if ("internal".equalsIgnoreCase(location)) {
-    		persistentRoot = activity.getFilesDir().getAbsolutePath() + "/files/";
+    		persistentRoot = getDataPath();
     		this.configured = true;
     	} else if ("compatibility".equalsIgnoreCase(location)) {
     		/*
@@ -201,7 +201,7 @@ public class FileUtils extends TrinityPlugin {
     			tempRoot = Environment.getExternalStorageDirectory().getAbsolutePath() +
     					"/Android/data/" + packageName + "/cache/";
     		} else {
-    			persistentRoot = "/data/data/" + packageName;
+    			persistentRoot = getDataPath();
     		}
     		this.configured = true;
     	}
@@ -239,7 +239,10 @@ public class FileUtils extends TrinityPlugin {
 	}
 
 	private Filesystem filesystemForURL(LocalFilesystemURL localURL) {
-    	if (localURL == null) return null;
+    	if (localURL == null)
+        {
+            return null;
+        }
     	return filesystemForName(localURL.fsName);
     }
 
@@ -265,6 +268,7 @@ public class FileUtils extends TrinityPlugin {
         }
     }
 
+    @Override
     public boolean execute(String action, final String rawArgs, final CallbackContext callbackContext) {
         if (!configured) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "File plugin is not configured. Please see the README.md file for details on how to update config.xml"));
@@ -272,6 +276,7 @@ public class FileUtils extends TrinityPlugin {
         }
         if (action.equals("testSaveLocationExists")) {
             threadhelper(new FileOp() {
+                @Override
                 public void run(JSONArray args) {
                     boolean b = DirectoryManager.testSaveLocationExists();
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, b));
@@ -280,6 +285,7 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("getFreeDiskSpace")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) {
                     // The getFreeDiskSpace plugin API is not documented, but some apps call it anyway via exec().
                     // For compatibility it always returns free space in the primary external storage, and
@@ -291,68 +297,117 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("testFileExists")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException {
                     String fname=args.getString(0);
-                    boolean b = DirectoryManager.testFileExists(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    boolean b = DirectoryManager.testFileExists(realPath);
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, b));
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("testDirectoryExists")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException {
                     String fname=args.getString(0);
-                    boolean b = DirectoryManager.testFileExists(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    boolean b = DirectoryManager.testFileExists(realPath);
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, b));
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("readAsText")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, MalformedURLException {
                     String encoding = args.getString(1);
                     int start = args.getInt(2);
                     int end = args.getInt(3);
                     String fname=args.getString(0);
-                    readFileAs(fname, start, end, callbackContext, encoding, PluginResult.MESSAGE_TYPE_STRING);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    readFileAs(realPath, start, end, callbackContext, encoding, PluginResult.MESSAGE_TYPE_STRING);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("readAsDataURL")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, MalformedURLException  {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname=args.getString(0);
-                    readFileAs(fname, start, end, callbackContext, null, -1);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    readFileAs(realPath, start, end, callbackContext, null, -1);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("readAsArrayBuffer")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, MalformedURLException  {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname=args.getString(0);
-                    readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    readFileAs(realPath, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("readAsBinaryString")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, MalformedURLException  {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname=args.getString(0);
-                    readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_BINARYSTRING);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    readFileAs(realPath, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_BINARYSTRING);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("write")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
                     String fname=args.getString(0);
-                    String nativeURL = resolveLocalFileSystemURI(fname).getString("nativeURL");
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    String nativeURL = resolveLocalFileSystemURI(realPath).getString("nativeURL");
                     String data=args.getString(1);
                     int offset=args.getInt(2);
                     Boolean isBinary=args.getBoolean(3);
@@ -370,16 +425,24 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("truncate")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
                     String fname=args.getString(0);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
                     int offset=args.getInt(1);
-                    long fileSize = truncateFile(fname, offset);
+                    long fileSize = truncateFile(realPath, offset);
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, fileSize));
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("requestAllFileSystems")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws IOException, JSONException {
                     callbackContext.success(requestAllFileSystems());
                 }
@@ -387,6 +450,7 @@ public class FileUtils extends TrinityPlugin {
         } else if (action.equals("requestAllPaths")) {
             cordova.getThreadPool().execute(
                     new Runnable() {
+                        @Override
                         public void run() {
                         	try {
 					callbackContext.success(requestAllPaths());
@@ -399,6 +463,7 @@ public class FileUtils extends TrinityPlugin {
             );
         } else if (action.equals("requestFileSystem")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException {
                     int fstype = args.getInt(0);
                     long requiredSize = args.optLong(1);
@@ -408,27 +473,48 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("resolveLocalFileSystemURI")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws IOException, JSONException {
                     String fname=args.getString(0);
-                    JSONObject obj = resolveLocalFileSystemURI(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONObject obj = resolveLocalFileSystemURI(realPath);
                     callbackContext.success(obj);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("getFileMetadata")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws FileNotFoundException, JSONException, MalformedURLException {
                     String fname=args.getString(0);
-                    JSONObject obj = getFileMetadata(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONObject obj = getFileMetadata(realPath);
                     callbackContext.success(obj);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("getParent")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, IOException {
                     String fname=args.getString(0);
-                    JSONObject obj = getParent(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONObject obj = getParent(realPath);
                     callbackContext.success(obj);
                 }
             }, rawArgs, callbackContext);
@@ -448,7 +534,13 @@ public class FileUtils extends TrinityPlugin {
                         getReadPermission(rawArgs, ACTION_GET_DIRECTORY, callbackContext);
                     }
                     else {
-                        JSONObject obj = getFile(dirname, path, args.optJSONObject(2), true);
+                        String realPath = null;
+                        try {
+                            realPath = getCanonicalPath(path);
+                        } catch (Exception e) {
+                            callbackContext.error(e.getLocalizedMessage());
+                        }
+                        JSONObject obj = getFile(dirname, realPath, args.optJSONObject(2), true);
                         callbackContext.success(obj);
                     }
                 }
@@ -456,6 +548,7 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("getFile")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws FileExistsException, IOException, TypeMismatchException, EncodingException, JSONException {
                     String dirname = args.getString(0);
                     String path = args.getString(1);
@@ -469,7 +562,13 @@ public class FileUtils extends TrinityPlugin {
                         getReadPermission(rawArgs, ACTION_GET_FILE, callbackContext);
                     }
                     else {
-                        JSONObject obj = getFile(dirname, path, args.optJSONObject(2), false);
+                        String realPath = null;
+                        try {
+                            realPath = getCanonicalPath(path);
+                        } catch (Exception e) {
+                            callbackContext.error(e.getLocalizedMessage());
+                        }
+                        JSONObject obj = getFile(dirname, realPath, args.optJSONObject(2), false);
                         callbackContext.success(obj);
                     }
                 }
@@ -477,9 +576,16 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("remove")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, NoModificationAllowedException, InvalidModificationException, MalformedURLException {
                     String fname=args.getString(0);
-                    boolean success = remove(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    boolean success = remove(realPath);
                     if (success) {
                         callbackContext.success();
                     } else {
@@ -490,9 +596,16 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("removeRecursively")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, FileExistsException, MalformedURLException, NoModificationAllowedException {
                     String fname=args.getString(0);
-                    boolean success = removeRecursively(fname);
+                    String realPath = null;
+                    try {
+                        realPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    boolean success = removeRecursively(realPath);
                     if (success) {
                         callbackContext.success();
                     } else {
@@ -503,31 +616,64 @@ public class FileUtils extends TrinityPlugin {
         }
         else if (action.equals("moveTo")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, NoModificationAllowedException, IOException, InvalidModificationException, EncodingException, FileExistsException {
                     String fname=args.getString(0);
                     String newParent=args.getString(1);
                     String newName=args.getString(2);
-                    JSONObject entry = transferTo(fname, newParent, newName, true);
+                    String realSrcPath = null;
+                    try {
+                        realSrcPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    String realDestPath = null;
+                    try {
+                        realDestPath = getCanonicalPath(newParent);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONObject entry = transferTo(realSrcPath, realDestPath, newName, true);
                     callbackContext.success(entry);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("copyTo")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws JSONException, NoModificationAllowedException, IOException, InvalidModificationException, EncodingException, FileExistsException {
                     String fname=args.getString(0);
                     String newParent=args.getString(1);
                     String newName=args.getString(2);
-                    JSONObject entry = transferTo(fname, newParent, newName, false);
+                    String realSrcPath = null;
+                    try {
+                        realSrcPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    String realDestPath = null;
+                    try {
+                        realDestPath = getCanonicalPath(newParent);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONObject entry = transferTo(realSrcPath, realDestPath, newName, false);
                     callbackContext.success(entry);
                 }
             }, rawArgs, callbackContext);
         }
         else if (action.equals("readEntries")) {
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws FileNotFoundException, JSONException, MalformedURLException {
                     String fname=args.getString(0);
-                    JSONArray entries = readEntries(fname);
+                    String realSrcPath = null;
+                    try {
+                        realSrcPath = getCanonicalPath(fname);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    JSONArray entries = readEntries(realSrcPath);
                     callbackContext.success(entries);
                 }
             }, rawArgs, callbackContext);
@@ -536,9 +682,16 @@ public class FileUtils extends TrinityPlugin {
             // Internal method for testing: Get the on-disk location of a local filesystem url.
             // [Currently used for testing file-transfer]
             threadhelper( new FileOp( ){
+                @Override
                 public void run(JSONArray args) throws FileNotFoundException, JSONException, MalformedURLException {
                     String localURLstr = args.getString(0);
-                    String fname = filesystemPathForURL(localURLstr);
+                    String realSrcPath = null;
+                    try {
+                        realSrcPath = getCanonicalPath(localURLstr);
+                    } catch (Exception e) {
+                        callbackContext.error(e.getLocalizedMessage());
+                    }
+                    String fname = filesystemPathForURL(realSrcPath);
                     callbackContext.success(fname);
                 }
             }, rawArgs, callbackContext);
@@ -658,6 +811,7 @@ public class FileUtils extends TrinityPlugin {
      */
     private void threadhelper(final FileOp f, final String rawArgs, final CallbackContext callbackContext){
         cordova.getThreadPool().execute(new Runnable() {
+            @Override
             public void run() {
                 try {
                     JSONArray args = new JSONArray(rawArgs);
@@ -1167,7 +1321,7 @@ public class FileUtils extends TrinityPlugin {
     /*
      * Handle the response
      */
-
+    @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions,
                                           int[] grantResults) throws JSONException {
 
@@ -1185,6 +1339,7 @@ public class FileUtils extends TrinityPlugin {
             {
                 case ACTION_GET_FILE:
                     threadhelper( new FileOp( ){
+                        @Override
                         public void run(JSONArray args) throws FileExistsException, IOException, TypeMismatchException, EncodingException, JSONException {
                             String dirname = args.getString(0);
 
@@ -1196,6 +1351,7 @@ public class FileUtils extends TrinityPlugin {
                     break;
                 case ACTION_GET_DIRECTORY:
                     threadhelper( new FileOp( ){
+                        @Override
                         public void run(JSONArray args) throws FileExistsException, IOException, TypeMismatchException, EncodingException, JSONException {
                             String dirname = args.getString(0);
 
@@ -1207,6 +1363,7 @@ public class FileUtils extends TrinityPlugin {
                     break;
                 case ACTION_WRITE:
                     threadhelper( new FileOp( ){
+                        @Override
                         public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
                             String fname=args.getString(0);
                             String data=args.getString(1);
