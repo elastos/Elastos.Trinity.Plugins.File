@@ -184,9 +184,9 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
-    	tempRoot = getDataPath();
+    	tempRoot = activity.getCacheDir().getAbsolutePath();
     	if ("internal".equalsIgnoreCase(location)) {
-    		persistentRoot = getDataPath();
+    		persistentRoot = activity.getFilesDir().getAbsolutePath() + "/files/";
     		this.configured = true;
     	} else if ("compatibility".equalsIgnoreCase(location)) {
     		/*
@@ -201,7 +201,7 @@ public class FileUtils extends TrinityPlugin {
     			tempRoot = Environment.getExternalStorageDirectory().getAbsolutePath() +
     					"/Android/data/" + packageName + "/cache/";
     		} else {
-    			persistentRoot = getDataPath();
+    			persistentRoot = "/data/data/" + packageName;
     		}
     		this.configured = true;
     	}
