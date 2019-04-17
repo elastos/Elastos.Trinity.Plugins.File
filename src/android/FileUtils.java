@@ -184,27 +184,27 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
-    	tempRoot = activity.getCacheDir().getAbsolutePath();
-    	if ("internal".equalsIgnoreCase(location)) {
-    		persistentRoot = activity.getFilesDir().getAbsolutePath() + "/files/";
-    		this.configured = true;
-    	} else if ("compatibility".equalsIgnoreCase(location)) {
-    		/*
-    		 *  Fall-back to compatibility mode -- this is the logic implemented in
-    		 *  earlier versions of this plugin, and should be maintained here so
-    		 *  that apps which were originally deployed with older versions of the
-    		 *  plugin can continue to provide access to files stored under those
-    		 *  versions.
-    		 */
-    		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-    			persistentRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-    			tempRoot = Environment.getExternalStorageDirectory().getAbsolutePath() +
-    					"/Android/data/" + packageName + "/cache/";
-    		} else {
-    			persistentRoot = "/data/data/" + packageName;
-    		}
-    		this.configured = true;
-    	}
+        tempRoot = getDataPath();
+        if ("internal".equalsIgnoreCase(location)) {
+            persistentRoot = getDataPath();
+            this.configured = true;
+        } else if ("compatibility".equalsIgnoreCase(location)) {
+            /*
+             *  Fall-back to compatibility mode -- this is the logic implemented in
+             *  earlier versions of this plugin, and should be maintained here so
+             *  that apps which were originally deployed with older versions of the
+             *  plugin can continue to provide access to files stored under those
+             *  versions.
+             */
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                persistentRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+                tempRoot = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                        "/Android/data/" + packageName + "/cache/";
+            } else {
+                persistentRoot = getDataPath();
+            }
+            this.configured = true;
+        }
 
     	if (this.configured) {
 			// Create the directories if they don't exist.
