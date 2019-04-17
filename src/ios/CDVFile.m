@@ -563,8 +563,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
  */
 - (void)resolveLocalFileSystemURI:(CDVInvokedUrlCommand*)command
 {
+    NSString* relativePath = [command argumentAtIndex:0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments
-    NSString* localURIstr = [command argumentAtIndex:0];
+    NSString* localURIstr = resourcePath;
     CDVPluginResult* result;
 
     localURIstr = [self encodePath:localURIstr]; //encode path before resolving
@@ -652,7 +662,11 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 {
     NSString* baseURIstr = [command argumentAtIndex:0];
     CDVFilesystemURL* baseURI = [self fileSystemURLforArg:baseURIstr];
-    NSString* requestedPath = [command argumentAtIndex:1];
+//    NSString* requestedPath = [command argumentAtIndex:1];
+    NSString* relativePath = [command argumentAtIndex:1];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* requestedPath = [self getCanonicalPath:relativePath error:&err];
     NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
 
     NSObject<CDVFileSystem> *fs = [self filesystemForURL:baseURI];
@@ -673,8 +687,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
  */
 - (void)getParent:(CDVInvokedUrlCommand*)command
 {
+    NSString* relativePath = [command argumentAtIndex:0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments are URL encoded
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
 
     NSObject<CDVFileSystem> *fs = [self filesystemForURL:localURI];
     CDVPluginResult* result = [fs getParentForURL:localURI];
@@ -708,8 +732,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 */
 - (void)remove:(CDVInvokedUrlCommand*)command
 {
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     CDVPluginResult* result = nil;
 
     if ([localURI.fullPath isEqualToString:@""]) {
@@ -732,8 +766,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
  */
 - (void)removeRecursively:(CDVInvokedUrlCommand*)command
 {
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     CDVPluginResult* result = nil;
 
     if ([localURI.fullPath isEqualToString:@""]) {
@@ -769,8 +813,29 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
     NSArray* arguments = command.arguments;
 
     // arguments
-    NSString* srcURLstr = [command argumentAtIndex:0];
-    NSString* destURLstr = [command argumentAtIndex:1];
+//    NSString* srcURLstr = [command argumentAtIndex:0];
+//    NSString* destURLstr = [command argumentAtIndex:1];
+    
+    NSString* relativeSrcPath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* srcURLstr = [self getCanonicalPath:relativeSrcPath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    NSString* relativeDestPath = command.arguments[1];
+    /*get absolute path*/
+    NSError *DestErr = nil;
+    NSString* destURLstr = [self getCanonicalPath:relativeDestPath error:&DestErr];
+    if(DestErr != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
 
     CDVPluginResult *result;
 
@@ -807,8 +872,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)getFileMetadata:(CDVInvokedUrlCommand*)command
 {
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSObject<CDVFileSystem> *fs = [self filesystemForURL:localURI];
     __weak CDVFile* weakSelf = self;
     [fs getFileMetadataForURL:localURI callback:^(CDVPluginResult* result) {
@@ -818,7 +893,17 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)readEntries:(CDVInvokedUrlCommand*)command
 {
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSObject<CDVFileSystem> *fs = [self filesystemForURL:localURI];
     CDVPluginResult *result = [fs readEntriesAtURL:localURI];
 
@@ -836,7 +921,19 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 - (void)readAsText:(CDVInvokedUrlCommand*)command
 {
     // arguments
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSString* encoding = [command argumentAtIndex:1];
     NSInteger start = [[command argumentAtIndex:2] integerValue];
     NSInteger end = [[command argumentAtIndex:3] integerValue];
@@ -893,7 +990,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)readAsDataURL:(CDVInvokedUrlCommand*)command
 {
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSInteger start = [[command argumentAtIndex:1] integerValue];
     NSInteger end = [[command argumentAtIndex:2] integerValue];
 
@@ -926,7 +1034,17 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)readAsArrayBuffer:(CDVInvokedUrlCommand*)command
 {
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSInteger start = [[command argumentAtIndex:1] integerValue];
     NSInteger end = [[command argumentAtIndex:2] integerValue];
 
@@ -950,7 +1068,17 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)readAsBinaryString:(CDVInvokedUrlCommand*)command
 {
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     NSInteger start = [[command argumentAtIndex:1] integerValue];
     NSInteger end = [[command argumentAtIndex:2] integerValue];
 
@@ -977,8 +1105,19 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)truncate:(CDVInvokedUrlCommand*)command
 {
+    
+    NSString* relativePath = command.arguments[0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
     // arguments
-    CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+    CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
     unsigned long long pos = (unsigned long long)[[command argumentAtIndex:1] longLongValue];
 
     NSObject<CDVFileSystem> *fs = [self filesystemForURL:localURI];
@@ -1000,9 +1139,20 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
     [self.commandDelegate runInBackground:^ {
         NSString* callbackId = command.callbackId;
+        
+        NSString* relativePath = command.arguments[0];
+        /*get absolute path*/
+        NSError *err = nil;
+        NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+        if(err != nil){
+            NSLog(@"can not get real path");
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            return ;
+        }
 
         // arguments
-        CDVFilesystemURL* localURI = [self fileSystemURLforArg:command.arguments[0]];
+        CDVFilesystemURL* localURI = [self fileSystemURLforArg:resourcePath];
         id argData = [command argumentAtIndex:1];
         unsigned long long pos = (unsigned long long)[[command argumentAtIndex:2] longLongValue];
 
@@ -1042,11 +1192,22 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 - (void)testFileExists:(CDVInvokedUrlCommand*)command
 {
     // arguments
-    NSString* argPath = [command argumentAtIndex:0];
+//    NSString* argPath = [command argumentAtIndex:0];
+    
+    NSString* relativePath = [command argumentAtIndex:0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
 
     // Get the file manager
     NSFileManager* fMgr = [NSFileManager defaultManager];
-    NSString* appFile = argPath; // [ self getFullPath: argPath];
+    NSString* appFile = resourcePath; // [ self getFullPath: argPath];
 
     BOOL bExists = [fMgr fileExistsAtPath:appFile];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:(bExists ? 1 : 0)];
@@ -1057,11 +1218,20 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 - (void)testDirectoryExists:(CDVInvokedUrlCommand*)command
 {
     // arguments
-    NSString* argPath = [command argumentAtIndex:0];
+    NSString* relativePath = [command argumentAtIndex:0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
 
     // Get the file manager
     NSFileManager* fMgr = [[NSFileManager alloc] init];
-    NSString* appFile = argPath; // [self getFullPath: argPath];
+    NSString* appFile = resourcePath; // [self getFullPath: argPath];
     BOOL bIsDir = NO;
     BOOL bExists = [fMgr fileExistsAtPath:appFile isDirectory:&bIsDir];
 
@@ -1104,7 +1274,18 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
 
 - (void)_getLocalFilesystemPath:(CDVInvokedUrlCommand*)command
 {
-    CDVFilesystemURL* localURL = [self fileSystemURLforArg:command.arguments[0]];
+    NSString* relativePath = [command argumentAtIndex:0];
+    /*get absolute path*/
+    NSError *err = nil;
+    NSString* resourcePath = [self getCanonicalPath:relativePath error:&err];
+    if(err != nil){
+        NSLog(@"can not get real path");
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:err.userInfo[NSLocalizedDescriptionKey]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return ;
+    }
+    
+    CDVFilesystemURL* localURL = [self fileSystemURLforArg:resourcePath];
 
     NSString* fsPath = [self filesystemPathForURL:localURL];
     CDVPluginResult* result;
