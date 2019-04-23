@@ -343,13 +343,7 @@ public class FileUtils extends TrinityPlugin {
                     int start = args.getInt(2);
                     int end = args.getInt(3);
                     String fname=args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    readFileAs(realPath, start, end, callbackContext, encoding, PluginResult.MESSAGE_TYPE_STRING);
+                    readFileAs(fname, start, end, callbackContext, encoding, PluginResult.MESSAGE_TYPE_STRING);
                 }
             }, rawArgs, callbackContext);
         }
@@ -360,13 +354,7 @@ public class FileUtils extends TrinityPlugin {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname=args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    readFileAs(realPath, start, end, callbackContext, null, -1);
+                    readFileAs(fname, start, end, callbackContext, null, -1);
                 }
             }, rawArgs, callbackContext);
         }
@@ -377,13 +365,7 @@ public class FileUtils extends TrinityPlugin {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname=args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    readFileAs(realPath, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
+                    readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
                 }
             }, rawArgs, callbackContext);
         }
@@ -394,13 +376,7 @@ public class FileUtils extends TrinityPlugin {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
                     String fname = args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    readFileAs(realPath, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_BINARYSTRING);
+                    readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_BINARYSTRING);
                 }
             }, rawArgs, callbackContext);
         }
@@ -409,13 +385,7 @@ public class FileUtils extends TrinityPlugin {
                 @Override
                 public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
                     String fname = args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    String nativeURL = resolveLocalFileSystemURI(realPath).getString("nativeURL");
+                    String nativeURL = resolveLocalFileSystemURI(fname).getString("nativeURL");
                     String data=args.getString(1);
                     int offset=args.getInt(2);
                     Boolean isBinary=args.getBoolean(3);
@@ -500,13 +470,7 @@ public class FileUtils extends TrinityPlugin {
                 @Override
                 public void run(JSONArray args) throws FileNotFoundException, JSONException, MalformedURLException {
                     String fname=args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    JSONObject obj = getFileMetadata(realPath);
+                    JSONObject obj = getFileMetadata(fname);
                     callbackContext.success(obj);
                 }
             }, rawArgs, callbackContext);
@@ -516,13 +480,7 @@ public class FileUtils extends TrinityPlugin {
                 @Override
                 public void run(JSONArray args) throws JSONException, IOException {
                     String fname=args.getString(0);
-                    String realPath = null;
-                    try {
-                        realPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    JSONObject obj = getParent(realPath);
+                    JSONObject obj = getParent(fname);
                     callbackContext.success(obj);
                 }
             }, rawArgs, callbackContext);
@@ -542,13 +500,7 @@ public class FileUtils extends TrinityPlugin {
                         getReadPermission(rawArgs, ACTION_GET_DIRECTORY, callbackContext);
                     }
                     else {
-                        String realPath = null;
-                        try {
-                            realPath = fileGetCanonicalPath(path);
-                        } catch (Exception e) {
-                            callbackContext.error(e.getLocalizedMessage());
-                        }
-                        JSONObject obj = getFile(dirname, realPath, args.optJSONObject(2), true);
+                        JSONObject obj = getFile(dirname, path, args.optJSONObject(2), true);
                         callbackContext.success(obj);
                     }
                 }
@@ -675,13 +627,7 @@ public class FileUtils extends TrinityPlugin {
                 @Override
                 public void run(JSONArray args) throws FileNotFoundException, JSONException, MalformedURLException {
                     String fname=args.getString(0);
-                    String realSrcPath = null;
-                    try {
-                        realSrcPath = fileGetCanonicalPath(fname);
-                    } catch (Exception e) {
-                        callbackContext.error(e.getLocalizedMessage());
-                    }
-                    JSONArray entries = readEntries(realSrcPath);
+                    JSONArray entries = readEntries(fname);
                     callbackContext.success(entries);
                 }
             }, rawArgs, callbackContext);
