@@ -122,7 +122,8 @@ public class FileUtils extends TrinityPlugin {
     }
 
     protected String[] getExtraFileSystemsPreference(Activity activity) {
-        String fileSystemsStr = preferences.getString("androidextrafilesystems", "files,files-external,documents,sdcard,cache,cache-external,assets,root");
+        String fileSystemsStr = preferences.getString("androidextrafilesystems",
+                "files,files-external,documents,sdcard,cache,cache-external,assets,root");
         return fileSystemsStr.split(",");
     }
 
@@ -152,10 +153,17 @@ public class FileUtils extends TrinityPlugin {
         Context context = activity.getApplicationContext();
         HashMap<String, String> availableFileSystems = new HashMap<String,String>();
 
-        availableFileSystems.put("files", context.getFilesDir().getAbsolutePath());
-        availableFileSystems.put("documents", new File(context.getFilesDir(), "Documents").getAbsolutePath());
-        availableFileSystems.put("cache", context.getCacheDir().getAbsolutePath());
-        availableFileSystems.put("root", "/");
+//        availableFileSystems.put("files", context.getFilesDir().getAbsolutePath());
+//        availableFileSystems.put("documents", new File(context.getFilesDir(), "Documents").getAbsolutePath());
+//        availableFileSystems.put("cache", context.getCacheDir().getAbsolutePath());
+//        availableFileSystems.put("root", "/");
+
+        availableFileSystems.put("files", getDataPath());
+        availableFileSystems.put("documents", getDataPath());
+        availableFileSystems.put("cache", getDataPath() + "/cache/");
+        availableFileSystems.put("root", getDataPath());
+
+
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
           try {
             availableFileSystems.put("files-external", context.getExternalFilesDir(null).getAbsolutePath());
@@ -302,7 +310,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -318,7 +326,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -337,7 +345,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -354,7 +362,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -371,7 +379,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -385,10 +393,10 @@ public class FileUtils extends TrinityPlugin {
                 public void run(JSONArray args) throws JSONException, MalformedURLException  {
                     int start = args.getInt(1);
                     int end = args.getInt(2);
-                    String fname=args.getString(0);
+                    String fname = args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -400,10 +408,10 @@ public class FileUtils extends TrinityPlugin {
             threadhelper( new FileOp( ){
                 @Override
                 public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
-                    String fname=args.getString(0);
+                    String fname = args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -430,7 +438,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -478,7 +486,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -494,7 +502,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -510,7 +518,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -536,7 +544,7 @@ public class FileUtils extends TrinityPlugin {
                     else {
                         String realPath = null;
                         try {
-                            realPath = getCanonicalPath(path);
+                            realPath = fileGetCanonicalPath(path);
                         } catch (Exception e) {
                             callbackContext.error(e.getLocalizedMessage());
                         }
@@ -564,7 +572,7 @@ public class FileUtils extends TrinityPlugin {
                     else {
                         String realPath = null;
                         try {
-                            realPath = getCanonicalPath(path);
+                            realPath = fileGetCanonicalPath(path);
                         } catch (Exception e) {
                             callbackContext.error(e.getLocalizedMessage());
                         }
@@ -581,7 +589,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -601,7 +609,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realPath = null;
                     try {
-                        realPath = getCanonicalPath(fname);
+                        realPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -623,13 +631,13 @@ public class FileUtils extends TrinityPlugin {
                     String newName=args.getString(2);
                     String realSrcPath = null;
                     try {
-                        realSrcPath = getCanonicalPath(fname);
+                        realSrcPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
                     String realDestPath = null;
                     try {
-                        realDestPath = getCanonicalPath(newParent);
+                        realDestPath = fileGetCanonicalPath(newParent);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -647,13 +655,13 @@ public class FileUtils extends TrinityPlugin {
                     String newName=args.getString(2);
                     String realSrcPath = null;
                     try {
-                        realSrcPath = getCanonicalPath(fname);
+                        realSrcPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
                     String realDestPath = null;
                     try {
-                        realDestPath = getCanonicalPath(newParent);
+                        realDestPath = fileGetCanonicalPath(newParent);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -669,7 +677,7 @@ public class FileUtils extends TrinityPlugin {
                     String fname=args.getString(0);
                     String realSrcPath = null;
                     try {
-                        realSrcPath = getCanonicalPath(fname);
+                        realSrcPath = fileGetCanonicalPath(fname);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -687,7 +695,7 @@ public class FileUtils extends TrinityPlugin {
                     String localURLstr = args.getString(0);
                     String realSrcPath = null;
                     try {
-                        realSrcPath = getCanonicalPath(localURLstr);
+                        realSrcPath = fileGetCanonicalPath(localURLstr);
                     } catch (Exception e) {
                         callbackContext.error(e.getLocalizedMessage());
                     }
@@ -1142,10 +1150,16 @@ public class FileUtils extends TrinityPlugin {
     private JSONObject requestAllPaths() throws JSONException {
         Context context = cordova.getActivity();
         JSONObject ret = new JSONObject();
-        ret.put("applicationDirectory", "file:///android_asset/");
-        ret.put("applicationStorageDirectory", toDirUrl(context.getFilesDir().getParentFile()));
-        ret.put("dataDirectory", toDirUrl(context.getFilesDir()));
-        ret.put("cacheDirectory", toDirUrl(context.getCacheDir()));
+//        ret.put("applicationDirectory", "file:///android_asset/");
+//        ret.put("applicationStorageDirectory", toDirUrl(context.getFilesDir().getParentFile()));
+//        ret.put("dataDirectory", toDirUrl(context.getFilesDir()));
+//        ret.put("cacheDirectory", toDirUrl(context.getCacheDir()));
+
+        ret.put("applicationDirectory", toDirUrl(new File(getAppPath())));
+        ret.put("applicationStorageDirectory", toDirUrl(new File(getDataPath())));
+        ret.put("dataDirectory", toDirUrl(new File(getDataPath())));
+        ret.put("cacheDirectory", toDirUrl(new File(getDataPath() + "/cache/")));
+
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
           try {
             ret.put("externalApplicationStorageDirectory", toDirUrl(context.getExternalFilesDir(null).getParentFile()));
@@ -1378,5 +1392,20 @@ public class FileUtils extends TrinityPlugin {
         } else {
            LOG.d(LOG_TAG, "Received permission callback for unknown request code");
         }
+    }
+
+    public String fileGetCanonicalPath(String path) throws Exception {
+        if (path.startsWith("cdvfile://localhost/temporary/")) {
+            return getCanonicalPath(path.replace("cdvfile://localhost/temporary/", "trinity:///temp/"));
+        }
+        else if (path.startsWith("cdvfile://localhost/persistent/")) {
+            return getCanonicalPath(path.replace("cdvfile://localhost/persistent/", "trinity:///data/"));
+        }
+        else if (path.startsWith("cdvfile://localhost/root/")) {
+            return getCanonicalPath(path.replace("cdvfile://localhost/root/", "trinity:///data/"));
+        }
+
+        return path;
+//        return getCanonicalPath(path);
     }
 }
