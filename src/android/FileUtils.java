@@ -192,7 +192,7 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
-        tempRoot = getDataPath();
+        tempRoot = getDataPath() + "/temp/";
         if ("internal".equalsIgnoreCase(location)) {
             persistentRoot = getDataPath();
             this.configured = true;
@@ -1341,17 +1341,13 @@ public class FileUtils extends TrinityPlugin {
     }
 
     public String fileGetCanonicalPath(String path) throws Exception {
-        if (path.startsWith("cdvfile://localhost/temporary/")) {
-            return getCanonicalPath(path.replace("cdvfile://localhost/temporary/", "trinity:///temp/"));
+        if (path.startsWith("cdvfile://localhost/")) {
+            return path;
         }
-        else if (path.startsWith("cdvfile://localhost/persistent/")) {
-            return getCanonicalPath(path.replace("cdvfile://localhost/persistent/", "trinity:///data/"));
-        }
-        else if (path.startsWith("cdvfile://localhost/root/")) {
-            return getCanonicalPath(path.replace("cdvfile://localhost/root/", "trinity:///data/"));
+        else if (path.indexOf("://") != -1) {
+            return getCanonicalPath(path);
         }
 
         return path;
-//        return getCanonicalPath(path);
     }
 }
