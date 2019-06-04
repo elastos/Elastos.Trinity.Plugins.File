@@ -192,7 +192,7 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
-        tempRoot = getDataPath() + "/temp/";
+        tempRoot = getTempPath();
         if ("internal".equalsIgnoreCase(location)) {
             persistentRoot = getDataPath();
             this.configured = true;
