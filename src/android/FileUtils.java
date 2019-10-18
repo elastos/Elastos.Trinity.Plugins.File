@@ -184,6 +184,7 @@ public class FileUtils extends TrinityPlugin {
     	this.filesystems = new ArrayList<Filesystem>();
         this.pendingRequests = new PendingRequests();
 
+        String appRoot = null;
     	String tempRoot = null;
     	String persistentRoot = null;
 
@@ -192,6 +193,7 @@ public class FileUtils extends TrinityPlugin {
 
         String location = preferences.getString("androidpersistentfilelocation", "internal");
 
+        appRoot = getAppPath();
         tempRoot = getTempPath();
         if ("internal".equalsIgnoreCase(location)) {
             persistentRoot = getDataPath();
@@ -215,6 +217,7 @@ public class FileUtils extends TrinityPlugin {
         }
 
     	if (this.configured) {
+            File appRootFile = new File(appRoot);
 			// Create the directories if they don't exist.
 			File tmpRootFile = new File(tempRoot);
             File persistentRootFile = new File(persistentRoot);
@@ -225,7 +228,8 @@ public class FileUtils extends TrinityPlugin {
     		// Note: The temporary and persistent filesystems need to be the first two
     		// registered, so that they will match window.TEMPORARY and window.PERSISTENT,
     		// per spec.
-    		this.registerFilesystem(new LocalFilesystem("temporary", webView.getContext(), webView.getResourceApi(), tmpRootFile));
+    		this.registerFilesystem(new LocalFilesystem("app", webView.getContext(), webView.getResourceApi(), appRootFile));
+            this.registerFilesystem(new LocalFilesystem("temporary", webView.getContext(), webView.getResourceApi(), tmpRootFile));
     		this.registerFilesystem(new LocalFilesystem("persistent", webView.getContext(), webView.getResourceApi(), persistentRootFile));
     		this.registerFilesystem(new ContentFilesystem(webView.getContext(), webView.getResourceApi()));
             this.registerFilesystem(new AssetFilesystem(webView.getContext().getAssets(), webView.getResourceApi()));
