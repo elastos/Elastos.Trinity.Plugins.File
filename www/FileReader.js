@@ -217,6 +217,20 @@ FileReader.prototype.abort = function () {
  *
  * @param file          {File} File object containing file properties
  * @param encoding      [Optional] (see http://www.iana.org/assignments/character-sets)
+ * @example
+ * function errorHandler(e) {
+ *    console.log("Error: " + e.code);
+ * }
+ *
+ * function readFile(fileEntry) {
+ *     fileEntry.file(function (file) {
+ *         var reader = new FileReader();
+ *         reader.onloadend = function() {
+ *             console.log("File content: " + this.result);
+ *         };
+ *         reader.readAsText(file);
+ *     }, errorHandler);
+ * }
  */
 FileReader.prototype.readAsText = function (file, encoding) {
     if (initRead(this, file)) {

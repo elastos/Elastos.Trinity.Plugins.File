@@ -96,6 +96,26 @@ FileWriter.prototype.abort = function () {
  *
  * @param data text or blob to be written
  * @param isPendingBlobReadResult {Boolean} true if the data is the pending blob read operation result
+ * @example
+ * function errorHandler(e) {
+ *    console.log("Error: " + e.code);
+ * }
+ *
+ * function writeFile(fileEntry, content, count) {
+ *    fileEntry.createWriter(function(fileWriter) {
+ *        fileWriter.onwriteend = function(e) {
+ *            console.log('Write completed.');
+ *        };
+ * 
+ *        fileWriter.onerror = function(e) {
+ *            console.log('Write failed: ' + e.toString());
+ *        };
+ * 
+ *        fileWriter.seek(fileWriter.length);
+ *        var dataObj = new Blob([content], { type: 'text/plain' });
+ *        fileWriter.write(dataObj);
+ *    }, errorHandler);
+ * }
  */
 FileWriter.prototype.write = function (data, isPendingBlobReadResult) {
 
