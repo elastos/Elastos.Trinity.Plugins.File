@@ -516,7 +516,7 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
         @"applicationDirectory": [self getAppUrl],
         @"applicationStorageDirectory": [self getDataUrl],
         @"dataDirectory": [self getDataUrl],
-        @"cacheDirectory": [[self getDataUrl] stringByAppendingString:@"/cache/"],
+        @"cacheDirectory": [[self getDataUrl] stringByAppendingString:@"cache/"],
         @"tempDirectory": [self getTempUrl]
     };
 
